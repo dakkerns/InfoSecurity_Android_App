@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">InfoSecurity_Android_App</string>
+    <string name="app_name">InfoSecurity Android App</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_password_generator">PasswordGeneratorActivity</string>
+    <string name="title_activity_password_generator">Password Generator</string>
     <string name="password_generator_button">Password Generator</string>
     <string name="password_validator_button">Password Validator</string>
     <string name="file_authenticator_button">File Authenticator</string>
-    <string name="title_activity_password_validator">PasswordValidatorActivity</string>
-    <string name="title_activity_file_authenticator">FileAuthenticatorActivity</string>
+    <string name="title_activity_password_validator">Password Validator</string>
+    <string name="title_activity_file_authenticator">File Authenticator</string>
 </resources>
