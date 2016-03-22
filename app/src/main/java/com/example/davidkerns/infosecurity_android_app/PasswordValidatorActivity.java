@@ -31,39 +31,53 @@ public class PasswordValidatorActivity extends AppCompatActivity {
 
     void showpass(){
         EditText passField = (EditText)findViewById(R.id.passfield);
-        String toastMessage = "Password: " + passField.getText().toString();
-        Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
-        toast.show();
+        String password = passField.getText().toString();
 
         TextView letter = (TextView) findViewById(R.id.haslet);
         TextView number = (TextView) findViewById(R.id.hasnum);
         TextView special = (TextView) findViewById(R.id.hasspec);
+        TextView length = (TextView) findViewById(R.id.haslen);
         TextView criteria = (TextView) findViewById(R.id.criteriamet);
 
         int metcount = 0;
 
-        if(toastMessage.matches(".*[a-zA-Z]+.*")) {
+        if(password.matches(".*[a-zA-Z]+.*")) {
             letter.setTextColor(Color.GREEN);
             metcount++;
         }
         else
             letter.setTextColor(Color.RED);
 
-        if(toastMessage.matches(".*\\d+.*")) {
+        if(password.matches(".*\\d+.*")) {
             number.setTextColor(Color.GREEN);
             metcount++;
         }
         else
             number.setTextColor(Color.RED);
 
-        if(toastMessage.matches(".*[!@#$%^&*]+.*")) {
+        if(password.matches(".*[!@#$%^&*]+.*")) {
             special.setTextColor(Color.GREEN);
             metcount++;
         }
         else
             special.setTextColor(Color.RED);
 
-        criteria.setText("Met "+metcount+" of 3 safety criteria");
+        if(password.length() >= 8) {
+            length.setTextColor(Color.GREEN);
+            metcount++;
+        }
+        else
+            length.setTextColor(Color.RED);
+
+        criteria.setText("Met "+metcount+" of 4 safety criteria");
+
+        if(metcount < 2)
+            criteria.setTextColor(Color.RED);
+        else if(metcount < 4)
+            criteria.setTextColor(Color.YELLOW);
+        else
+            criteria.setTextColor(Color.GREEN);
+
     }
 
 
