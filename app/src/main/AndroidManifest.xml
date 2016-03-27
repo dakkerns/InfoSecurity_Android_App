@@ -26,10 +26,6 @@
             android:name=".PasswordValidatorActivity"
             android:label="@string/title_activity_password_validator"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".FileAuthenticatorActivity"
-            android:label="@string/title_activity_file_authenticator"
-            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

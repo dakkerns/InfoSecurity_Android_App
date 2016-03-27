@@ -31,13 +31,6 @@
             android:id="@+id/password_validator_button"
             />
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/file_authenticator_button"
-            android:id="@+id/file_authenticator_button"
-            />
-
     </LinearLayout>
 
 </RelativeLayout>

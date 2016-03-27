@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
 
         Button passwordGeneratorButton = (Button) findViewById(R.id.password_generator_button);
         Button passwordValidatorButton = (Button) findViewById(R.id.password_validator_button);
-        Button fileAuthButton = (Button) findViewById(R.id.file_authenticator_button);
 
         passwordGeneratorButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,14 +28,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, PasswordValidatorActivity.class);
-                startActivity(i);
-            }
-        });
-
-        fileAuthButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getBaseContext(), FileAuthenticatorActivity.class);
                 startActivity(i);
             }
         });
