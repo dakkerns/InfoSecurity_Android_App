@@ -2,10 +2,9 @@ package com.example.davidkerns.infosecurity_android_app;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,7 +18,10 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_validator);
 
-        Button password_valid = (Button) findViewById(R.id.validate_pword);
+        Button password_valid = (Button) findViewById(R.id.show_pword);
+
+        EditText passField = (EditText)findViewById(R.id.passfield);
+        passField.addTextChangedListener(passwordWatcher);
 
         password_valid.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,7 +31,25 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         });
     }
 
+    private final TextWatcher passwordWatcher = new TextWatcher() {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        public void afterTextChanged(Editable s) {
+            validatepass();
+        }
+    };
+
     void showpass(){
+        EditText passField = (EditText)findViewById(R.id.passfield);
+        String password = passField.getText().toString();
+
+        Toast pass = Toast.makeText(getApplicationContext(), password, Toast.LENGTH_SHORT);
+        pass.show();
+    }
+
+    void validatepass(){
         EditText passField = (EditText)findViewById(R.id.passfield);
         String password = passField.getText().toString();
 
