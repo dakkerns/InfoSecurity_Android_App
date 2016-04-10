@@ -18,13 +18,15 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private final String alpha_caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final String alpha_lowers = "abcdefghijklmnopqrstuvwxyz";
     private final String alpha_digits = "0123456789";
-    private final String alpha_specials = "!@#$%^&*_+-=/{}[]<>";
+    private final String alpha_specials = "!@#$%^&*_+-=/{}[]()<>;:'?|,.~`";
+    private final double guesses = 1.0e10;
 
     private EditText lengthText;
     private EditText capsText;
     private EditText digitsText;
     private EditText specialsText;
     private TextView generatedText;
+    private TextView cracktimeText;
 
     private int length = 0, caps = 0, digits = 0, specials = 0;
 
@@ -43,6 +45,7 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         specialsText = (EditText)findViewById(R.id.password_specials);
 
         generatedText = (TextView)findViewById(R.id.generated_password);
+        cracktimeText = (TextView)findViewById(R.id.cracktime);
 
         Button password_valid = (Button) findViewById(R.id.generate_pword);
 
@@ -50,7 +53,10 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean flag = fieldValidation();
-                if(flag) generatePassword(length, caps, digits, specials);
+                if(flag){
+                    generatePassword(length, caps, digits, specials);
+                    calcCrackTime(length, caps, digits, specials);
+                }
             }
         });
     }
@@ -87,6 +93,26 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         return ind;
     }
 
+    private void calcCrackTime(int length, int caps, int digits, int specials){
+
+        int sumAlphabet = 0;
+        String cracktimeStr = "";
+        if(caps > 0) sumAlphabet+=alpha_caps.length();
+        if(digits > 0) sumAlphabet+=alpha_digits.length();
+        if(specials > 0) sumAlphabet+=alpha_specials.length();
+        if(caps+digits+specials < length) sumAlphabet+=alpha_lowers.length();
+
+        double cracktime = Math.pow(sumAlphabet, length) / guesses;
+        if(cracktime < 60) cracktimeStr = Double.toString(Math.round(cracktime * 10000d) / 10000d) + " seconds to crack";
+        else if(cracktime < 3600) cracktimeStr = Double.toString(Math.round((cracktime/60) * 10000d) / 10000d) + " minutes to crack";
+        else if(cracktime < 86400) cracktimeStr = Double.toString(Math.round((cracktime/3600) * 10000d) / 10000d) + " hours to crack";
+        else if(cracktime < 604800) cracktimeStr = Double.toString(Math.round((cracktime/86400) * 10000d) / 10000d) + " days to crack";
+        else if(cracktime < 2419200) cracktimeStr = Double.toString(Math.round((cracktime/604800) * 10000d) / 10000d) + " weeks to crack";
+        else if(cracktime < 29030400) cracktimeStr = Double.toString(Math.round((cracktime/2419200) * 10000d) / 10000d) + " months to crack";
+        else cracktimeStr = Double.toString(Math.round((cracktime/29030400) * 1000d) / 1000d) + " years to crack";
+        cracktimeText.setText(cracktimeStr);
+    }
+
     private boolean fieldValidation(){
 
         try{
@@ -100,12 +126,14 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             return false;
         }
 
-        if(length > 50){
-            lengthText.setError("Length must be 50 or below.");
+        if(length > 50 || length < 0){
+            lengthText.setError("Length must be lower than 50 and greater than 0.");
             return false;
         }
 
-        if(!capsText.getText().toString().trim().equalsIgnoreCase("")) {
+        if(capsText.getText().toString().trim().equalsIgnoreCase("")){
+            caps = 0;
+        }else{
             try {
                 caps = Integer.parseInt(capsText.getText().toString());
             } catch (NumberFormatException e) {
@@ -114,7 +142,14 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             }
         }
 
-        if(!digitsText.getText().toString().trim().equalsIgnoreCase("")) {
+        if(caps < 0){
+            capsText.setError("Cannot be less than 0");
+            return false;
+        }
+
+        if(digitsText.getText().toString().trim().equalsIgnoreCase("")){
+            digits = 0;
+        }else{
             try {
                 digits = Integer.parseInt(digitsText.getText().toString());
             } catch (NumberFormatException e) {
@@ -123,13 +158,25 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             }
         }
 
-        if(!specialsText.getText().toString().trim().equalsIgnoreCase("")) {
+        if(digits < 0){
+            digitsText.setError("Cannot be less than 0");
+            return false;
+        }
+
+        if(specialsText.getText().toString().trim().equalsIgnoreCase("")){
+            specials = 0;
+        }else{
             try {
                 specials = Integer.parseInt(specialsText.getText().toString());
             } catch (NumberFormatException e) {
                 specialsText.setError("Please enter an integer");
                 return false;
             }
+        }
+
+        if(specials < 0){
+            specialsText.setError("Cannot be less than 0");
+            return false;
         }
 
         if(caps + digits + specials > length){

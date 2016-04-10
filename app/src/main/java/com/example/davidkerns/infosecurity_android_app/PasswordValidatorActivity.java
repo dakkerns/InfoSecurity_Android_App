@@ -18,7 +18,7 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_validator);
 
-        Button password_valid = (Button) findViewById(R.id.show_pword);
+        Button password_valid = (Button) findViewById(R.id.validate_pword);
 
         EditText passField = (EditText)findViewById(R.id.passfield);
         passField.addTextChangedListener(passwordWatcher);
