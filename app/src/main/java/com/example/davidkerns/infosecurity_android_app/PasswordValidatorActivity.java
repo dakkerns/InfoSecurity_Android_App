@@ -123,16 +123,7 @@ public class PasswordValidatorActivity extends AppCompatActivity {
 
         return oldpass;
     }
-
-    String add_character(String password, String add_type){
-        switch (add_type) {
-            case "letter":
-                password += (char)((int)Math.floor(Math.random()*26+'a'));
-            case "number":
-
-        }
-        return password;
-    }
+    
 
     void validatepass(){
         EditText passField = (EditText)findViewById(R.id.passfield);
