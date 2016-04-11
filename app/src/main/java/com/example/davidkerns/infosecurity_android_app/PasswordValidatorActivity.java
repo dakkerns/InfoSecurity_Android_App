@@ -18,17 +18,24 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_validator);
 
-        Button password_valid = (Button) findViewById(R.id.validate_pword);
-
-        EditText passField = (EditText)findViewById(R.id.passfield);
-        passField.addTextChangedListener(passwordWatcher);
-
-        password_valid.setOnClickListener(new View.OnClickListener() {
+        Button show = (Button)findViewById(R.id.show_pword);
+        show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showpass();
             }
         });
+
+        Button gen = (Button)findViewById(R.id.genpass);
+        gen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generate_sim_pass();
+            }
+        });
+        EditText passField = (EditText)findViewById(R.id.passfield);
+        passField.addTextChangedListener(passwordWatcher);
+
     }
 
     private final TextWatcher passwordWatcher = new TextWatcher() {
@@ -47,6 +54,84 @@ public class PasswordValidatorActivity extends AppCompatActivity {
 
         Toast pass = Toast.makeText(getApplicationContext(), password, Toast.LENGTH_SHORT);
         pass.show();
+    }
+
+    void generate_sim_pass(){
+        EditText passField = (EditText)findViewById(R.id.passfield);
+        String password = passField.getText().toString();
+
+        password = lettonum(password);
+
+        password = fix_pass(password);
+
+        passField.setText(password);
+
+        showpass();
+    }
+
+    String lettonum(String oldpass){
+        char[] newpass = oldpass.toCharArray();
+        String oldlower = oldpass.toLowerCase();
+
+        int indexs = oldlower.indexOf("s");
+        if(indexs != -1)
+            newpass[indexs] = '$';
+
+        int indexe = oldlower.indexOf("e");
+        if(indexe != -1)
+            newpass[indexe] = '3';
+
+        int indexo = oldlower.lastIndexOf("o");
+        if(indexo != -1)
+            newpass[indexo] = '0';
+
+        return new String(newpass);
+    }
+
+    String fix_pass(String oldpass){
+        if(!oldpass.matches(".*[a-zA-Z]+.*")){
+            int letter;
+            do{
+                letter = (int)Math.floor(Math.random()*57+'A');
+            }while(letter <= 90 || letter >= 97);
+
+            oldpass += (char)letter;
+        }
+
+        if(!oldpass.matches(".*\\d+.*")) {
+            int num = (int)Math.floor(Math.random()*10+'0');
+
+            oldpass += (char)num;
+        }
+
+
+        if(!oldpass.matches(".*[!@#$%^&*]+.*")) {
+            char[] syms = "!@#$%^&*".toCharArray();
+
+            int sym = (int)Math.floor(Math.random()*syms.length);
+
+            oldpass += syms[sym];
+        }
+
+        if(oldpass.length() < 8){
+            while(oldpass.length() <8) {
+                int letter = (int) Math.floor(Math.random() * 26 + 'a');
+
+                oldpass += (char) letter;
+            }
+        }
+
+        return oldpass;
+    }
+
+    String add_character(String password, String add_type){
+        switch (add_type) {
+            case "letter":
+                password += (char)((int)Math.floor(Math.random()*26+'a'));
+            case "number":
+
+        }
+        return password;
     }
 
     void validatepass(){
@@ -99,7 +184,5 @@ public class PasswordValidatorActivity extends AppCompatActivity {
             criteria.setTextColor(Color.GREEN);
 
     }
-
-
 
 }
