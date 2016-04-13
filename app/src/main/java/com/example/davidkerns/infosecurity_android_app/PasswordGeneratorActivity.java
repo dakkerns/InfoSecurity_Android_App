@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Random;
 
@@ -18,17 +19,22 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private final String alpha_caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final String alpha_lowers = "abcdefghijklmnopqrstuvwxyz";
     private final String alpha_digits = "0123456789";
-    private final String alpha_specials = "!@#$%^&*_+-=/{}[]()<>;:'?|,.~`";
-    private final double guesses = 1.0e10;
+    private final String alpha_specials = "!@#$%^&*_+-=/{}()<>;:'?|,.~`";
+    private final double guesses = 5.0e9;
 
     private EditText lengthText;
     private EditText capsText;
     private EditText digitsText;
     private EditText specialsText;
+    private EditText phraseText;
     private TextView generatedText;
     private TextView cracktimeText;
 
+    private NumberFormat smallFormatter;
+    private NumberFormat largeFormatter;
+
     private int length = 0, caps = 0, digits = 0, specials = 0;
+    private String phrase;
 
     private Random rnd;
 
@@ -38,11 +44,14 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_password_generator);
 
         rnd = new Random();
+        smallFormatter = new DecimalFormat("0.00");
+        largeFormatter = new DecimalFormat("0.000E0");
 
         lengthText = (EditText)findViewById(R.id.password_length);
         capsText = (EditText)findViewById(R.id.password_caps);
         digitsText = (EditText)findViewById(R.id.password_digits);
         specialsText = (EditText)findViewById(R.id.password_specials);
+        phraseText = (EditText)findViewById(R.id.password_phrase);
 
         generatedText = (TextView)findViewById(R.id.generated_password);
         cracktimeText = (TextView)findViewById(R.id.cracktime);
@@ -54,17 +63,25 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean flag = fieldValidation();
                 if(flag){
-                    generatePassword(length, caps, digits, specials);
-                    calcCrackTime(length, caps, digits, specials);
+                    generatePassword(length, caps, digits, specials, phrase);
+                    calcCrackTime(length, caps, digits, specials, phrase);
                 }
             }
         });
     }
 
-    private void generatePassword(int length, int caps, int digits, int specials){
+    private void generatePassword(int length, int caps, int digits, int specials, String phrase){
 
         char[] password = new char[length];
         int index;
+
+        if(phrase != ""){
+            index = getNextIndex(length - phrase.length(), password);
+            for(int i = index; i < index + phrase.length(); i++){
+                password[i] = phrase.charAt(i-index);
+            }
+        }
+
         for(int i = 0; i < caps; i++){
             index = getNextIndex(length, password);
             password[index] = alpha_caps.charAt(rnd.nextInt(alpha_caps.length()));
@@ -93,23 +110,28 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         return ind;
     }
 
-    private void calcCrackTime(int length, int caps, int digits, int specials){
+    private void calcCrackTime(int length, int caps, int digits, int specials, String phrase){
 
         int sumAlphabet = 0;
         String cracktimeStr = "";
-        if(caps > 0) sumAlphabet+=alpha_caps.length();
-        if(digits > 0) sumAlphabet+=alpha_digits.length();
-        if(specials > 0) sumAlphabet+=alpha_specials.length();
-        if(caps+digits+specials < length) sumAlphabet+=alpha_lowers.length();
+        if(caps > 0 || phrase.matches(".*[A-Z].*")) sumAlphabet+=alpha_caps.length();
+        if(digits > 0 || phrase.matches(".*\\d.*")) sumAlphabet+=alpha_digits.length();
+        if(specials > 0 || phrase.matches(".*[!@#$%^&*_+-=/{}()<>;:'?|,.~`].*")) sumAlphabet+=alpha_specials.length();
+        if(caps+digits+specials+phrase.length() < length || phrase.matches(".*[a-z].*")) sumAlphabet+=alpha_lowers.length();
 
         double cracktime = Math.pow(sumAlphabet, length) / guesses;
-        if(cracktime < 60) cracktimeStr = Double.toString(Math.round(cracktime * 10000d) / 10000d) + " seconds to crack";
-        else if(cracktime < 3600) cracktimeStr = Double.toString(Math.round((cracktime/60) * 10000d) / 10000d) + " minutes to crack";
-        else if(cracktime < 86400) cracktimeStr = Double.toString(Math.round((cracktime/3600) * 10000d) / 10000d) + " hours to crack";
-        else if(cracktime < 604800) cracktimeStr = Double.toString(Math.round((cracktime/86400) * 10000d) / 10000d) + " days to crack";
-        else if(cracktime < 2419200) cracktimeStr = Double.toString(Math.round((cracktime/604800) * 10000d) / 10000d) + " weeks to crack";
-        else if(cracktime < 29030400) cracktimeStr = Double.toString(Math.round((cracktime/2419200) * 10000d) / 10000d) + " months to crack";
-        else cracktimeStr = Double.toString(Math.round((cracktime/29030400) * 1000d) / 1000d) + " years to crack";
+
+        if(cracktime < 60.0) cracktimeStr = smallFormatter.format(cracktime) + " seconds to crack";
+        else if(cracktime < 3600.0) cracktimeStr = smallFormatter.format(cracktime / 60.0) + " minutes to crack";
+        else if(cracktime < 86400.0) cracktimeStr = smallFormatter.format(cracktime / 3600.0) + " hours to crack";
+        else if(cracktime < 604800.0) cracktimeStr = smallFormatter.format(cracktime/86400.0) + " days to crack";
+        else if(cracktime < 2419200.0) cracktimeStr = smallFormatter.format(cracktime/604800.0) + " weeks to crack";
+        else if(cracktime < 29030400.0) cracktimeStr = smallFormatter.format(cracktime/2419200.0) + " months to crack";
+        else if(cracktime < 29030400.0 * 10.0) cracktimeStr = smallFormatter.format(cracktime/29030400.0) + " years to crack";
+        else if(cracktime < 29030400.0 * 100.0) cracktimeStr = smallFormatter.format(cracktime/(29030400.0 * 10.0)) + " decades to crack";
+        else if(cracktime < 29030400.0 * 1000.0) cracktimeStr = smallFormatter.format(cracktime/(29030400.0 * 100.0)) + " centuries to crack";
+        else if(cracktime < 29030400.0 * 1000.0 * 1000000.0) cracktimeStr = smallFormatter.format(cracktime/(29030400.0 * 1000.0)) + " millenia to crack";
+        else cracktimeStr = largeFormatter.format(cracktime/(29030400.0 * 1000.0)) + " millenia to crack";
         cracktimeText.setText(cracktimeStr);
     }
 
@@ -126,8 +148,8 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             return false;
         }
 
-        if(length > 50 || length < 0){
-            lengthText.setError("Length must be lower than 50 and greater than 0.");
+        if(length >= 100 || length < 0){
+            lengthText.setError("Length must be lower than 100 and greater than 0.");
             return false;
         }
 
@@ -179,9 +201,15 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             return false;
         }
 
-        if(caps + digits + specials > length){
-            capsText.setError("Sum of number of capitals, digits, and special characters must be " +
-                    "less than or equal to the desired length.");
+        if(phraseText.getText().toString().trim().equalsIgnoreCase("")){
+            phrase = "";
+        }else{
+            phrase = phraseText.getText().toString();
+        }
+
+        if(caps + digits + specials + phrase.length() > length){
+            phraseText.setError("Sum of number of capitals, digits, special characters, and phrase "
+                    + "length must be less than or equal to the desired length.");
             return false;
         }
 
