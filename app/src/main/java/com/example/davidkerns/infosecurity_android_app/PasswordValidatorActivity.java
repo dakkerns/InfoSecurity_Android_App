@@ -73,27 +73,40 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         char[] newpass = oldpass.toCharArray();
         String oldlower = oldpass.toLowerCase();
 
-        int indexs = oldlower.indexOf("s");
-        if(indexs != -1)
-            newpass[indexs] = '$';
+        int indexa = oldlower.indexOf("a");
+        if(indexa != -1)
+            newpass[indexa] = '@';
 
         int indexe = oldlower.indexOf("e");
-        if(indexe != -1)
+        if (indexe != -1)
             newpass[indexe] = '3';
+
+        int indexi = oldlower.indexOf("i");
+        if(indexi != -1)
+            newpass[indexi] = '!';
 
         int indexo = oldlower.lastIndexOf("o");
         if(indexo != -1)
             newpass[indexo] = '0';
 
+        int indexs = oldlower.indexOf("s");
+        if(indexs != -1)
+            newpass[indexs] = '$';
+
+
+
         return new String(newpass);
     }
 
     String fix_pass(String oldpass){
+
+        char[] syms = "!@#$%^&*".toCharArray();
+
         if(!oldpass.matches(".*[a-zA-Z]+.*")){
             int letter;
             do{
                 letter = (int)Math.floor(Math.random()*57+'A');
-            }while(letter <= 90 || letter >= 97);
+            }while(!(letter <= 90 || letter >= 97));
 
             oldpass += (char)letter;
         }
@@ -106,24 +119,37 @@ public class PasswordValidatorActivity extends AppCompatActivity {
 
 
         if(!oldpass.matches(".*[!@#$%^&*]+.*")) {
-            char[] syms = "!@#$%^&*".toCharArray();
 
             int sym = (int)Math.floor(Math.random()*syms.length);
 
             oldpass += syms[sym];
         }
 
-        if(oldpass.length() < 8){
-            while(oldpass.length() <8) {
-                int letter = (int) Math.floor(Math.random() * 26 + 'a');
+        if(oldpass.length() < 10){
+            while(oldpass.length() <10) {
+                int toInsert = (int) Math.floor(Math.random()*3);
 
-                oldpass += (char) letter;
+                char charAdd=' ';
+
+                switch (toInsert) {
+                    case 0:
+                        charAdd = (char)((int) Math.floor(Math.random() * 26 + 'a'));
+                        break;
+                    case 1:
+                        charAdd = syms[(int)Math.floor(Math.random()*syms.length)];
+                        break;
+                    case 2:
+                        charAdd = (char) ((int) Math.floor(Math.random() * 10 + '0'));
+                    default:
+                        break;
+                }
+                oldpass += charAdd;
             }
         }
 
         return oldpass;
     }
-    
+
 
     void validatepass(){
         EditText passField = (EditText)findViewById(R.id.passfield);
@@ -158,7 +184,7 @@ public class PasswordValidatorActivity extends AppCompatActivity {
         else
             special.setTextColor(Color.RED);
 
-        if(password.length() >= 8) {
+        if(password.length() >= 10) {
             length.setTextColor(Color.GREEN);
             metcount++;
         }
