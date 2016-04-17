@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -20,7 +21,9 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private final String alpha_lowers = "abcdefghijklmnopqrstuvwxyz";
     private final String alpha_digits = "0123456789";
     private final String alpha_specials = "!@#$%^&*_+-=/{}()<>;:'?|,.~`";
-    private final double guesses = 5.0e9;
+    private final double guessesLow = 5.0e9;
+    private final double guessesMedium = 3.5e11;
+    private final double guessesHigh = 1.0e14;
 
     private EditText lengthText;
     private EditText capsText;
@@ -29,11 +32,15 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private EditText phraseText;
     private TextView generatedText;
     private TextView cracktimeText;
+    private RadioButton radioLow;
+    private RadioButton radioMedium;
+    private RadioButton radioHigh;
 
     private NumberFormat smallFormatter;
     private NumberFormat largeFormatter;
 
     private int length = 0, caps = 0, digits = 0, specials = 0;
+    private double guesses;
     private String phrase;
 
     private Random rnd;
@@ -52,9 +59,13 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         digitsText = (EditText)findViewById(R.id.password_digits);
         specialsText = (EditText)findViewById(R.id.password_specials);
         phraseText = (EditText)findViewById(R.id.password_phrase);
-
         generatedText = (TextView)findViewById(R.id.generated_password);
         cracktimeText = (TextView)findViewById(R.id.cracktime);
+        radioLow = (RadioButton) findViewById(R.id.radio_low);
+        radioMedium = (RadioButton) findViewById(R.id.radio_medium);
+        radioHigh = (RadioButton) findViewById(R.id.radio_high);
+
+        radioLow.setChecked(true);
 
         Button password_valid = (Button) findViewById(R.id.generate_pword);
 
@@ -63,8 +74,9 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean flag = fieldValidation();
                 if(flag){
+                    guesses = crackSpeed();
                     generatePassword(length, caps, digits, specials, phrase);
-                    calcCrackTime(length, caps, digits, specials, phrase);
+                    calcCrackTime(length, caps, digits, specials, phrase, guesses);
                 }
             }
         });
@@ -110,7 +122,14 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         return ind;
     }
 
-    private void calcCrackTime(int length, int caps, int digits, int specials, String phrase){
+    private double crackSpeed(){
+        if(radioLow.isChecked()) return guessesLow;
+        else if(radioMedium.isChecked()) return guessesMedium;
+
+        return guessesHigh;
+    }
+
+    private void calcCrackTime(int length, int caps, int digits, int specials, String phrase, double guesses){
 
         int sumAlphabet = 0;
         String cracktimeStr = "";
@@ -136,6 +155,12 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     }
 
     private boolean fieldValidation(){
+
+        lengthText.setError(null);
+        capsText.setError(null);
+        digitsText.setError(null);
+        specialsText.setError(null);
+        phraseText.setError(null);
 
         try{
             if(lengthText.getText().toString().trim().equalsIgnoreCase("")){
