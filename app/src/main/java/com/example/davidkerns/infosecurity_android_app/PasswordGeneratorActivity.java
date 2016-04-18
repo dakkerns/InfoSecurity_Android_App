@@ -117,6 +117,7 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     }
 
     private int getNextIndex(int length, char[] password){
+        if(length == 0) return 0;
         int ind;
         while(password[ind = rnd.nextInt(length)] != 0);
         return ind;
